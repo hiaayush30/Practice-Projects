@@ -1,6 +1,6 @@
 const express=require("express"); 
 const { getContact,postContact,getContacts,putContact,deleteContact } = require("../controllers/contactController");
-const { postMiddleware } = require("../middlewares/errorHandler");
+const { postMiddleware } = require("../middlewares/zodMiddleware");
 const router=express.Router();
 
 // router.get("/",getContacts)

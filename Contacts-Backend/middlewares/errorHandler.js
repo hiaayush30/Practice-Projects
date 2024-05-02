@@ -1,21 +1,36 @@
-const errorHandler=function(err,req,res,next){
-    const statusCode=res.statusCode ? res.statusCode:500;
-    res.json({msg:err.msg})
+const errorHandler = function (err, req, res, next) {
+    const statusCode = res.statusCode ? res.statusCode : 500;
+    switch(statusCode){
+    case 400: res.json({
+        title: "Validation failed",
+        msg: err.message,
+        stackTrace: err.stack
+    })
+    case 401: res.json({
+        title: "Unauthorized",
+        msg: err.message,
+        stackTrace: err.stack
+    })
+    case 403: res.json({
+        title: "Forbidden",
+        msg: err.message,
+        stackTrace: err.stack
+    })
+    case 404: res.json({
+        title: "Not found",
+        msg: err.message,
+        stackTrace: err.stack
+    })
+    case 500: res.json({
+        title: "Server Error",
+        msg: err.message,
+        stackTrace: err.stack
+    })
+    default:
+        console.log("No errors!");
+    }
 }
 
-const zod=require("zod");
-
-const schema1=zod.object({
-    name:zod.string(),
-    email:zod.string().email(),
-    contact:zod.number()
-})
-
-function postMiddleware(req,res,next){
-    const response=schema1.safeParse(req.body);
-    !response.success ? res.status(400).json({msg:response.error.issues}):next()
-}
-
-module.exports={
-    postMiddleware
+module.exports = {
+    errorHandler
 }
