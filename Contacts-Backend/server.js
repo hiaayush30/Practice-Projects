@@ -2,7 +2,7 @@ const express=require ("express");
 const app=express();
 const dotenv=require("dotenv").config();
 const contactRoutes=require("./routes/ContactRoutes");
-const errorHandler=require("./middlewares/errorHandler");
+const { errorHandler } = require("./middlewares/errorHandler");
 
 app.use(express.json());
 app.use("/api/contacts",contactRoutes)

@@ -6,12 +6,12 @@ const schema1 = zod.object({
     contact: zod.number()
 })
 
-function postMiddleware(req, res, next) {
+function authMiddleware(req, res, next) {
     const response = schema1.safeParse(req.body);
     !response.success ? res.status(400).json({ msg: response.error.issues }) : next()
 }
 
 module.exports = {
     // errorHandler,
-    postMiddleware
+    authMiddleware
 }

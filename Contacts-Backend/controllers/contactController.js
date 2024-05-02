@@ -1,4 +1,5 @@
 const asyncHandler=require("express-async-handler");
+const { Contact } = require("../db");
 //express-async-handlers rescues us from writing the try catch blocks and passes any 
 //error to the error handlr automtically
 
@@ -9,8 +10,10 @@ const asyncHandler=require("express-async-handler");
 //@route GET /api/contacts
 //@access public
 const getContacts=asyncHandler(async (req,res)=>{
+    const allContacts=await Contact.find({});
     res.status(200).json({
-        msg:"Here are all the contacts"
+        msg:"Here are all the contacts",
+        contacts:allContacts
     })
 })
 
@@ -23,7 +26,11 @@ const postContact=asyncHandler(async (req,res)=>{
     //     res.status(400);
     //     throw new Error("all input fields are mandatory");
     // }
-    
+    await Contact.create({
+        name:req.body.name,
+        contact:req.body.contact,
+        email:req.body.email
+    })
     res.status(211).json({
         msg:"Contact added successfully!"
     })
@@ -34,6 +41,10 @@ const postContact=asyncHandler(async (req,res)=>{
 //@access public
 const getContact=asyncHandler(async (req,res)=>{
     const id=req.params.id;
+    const contact=await Contact.findById(id)
+    res.json({
+        msg:contact
+    })
 })
 
 //@desc update contact
@@ -41,6 +52,15 @@ const getContact=asyncHandler(async (req,res)=>{
 //@access public
 const putContact=asyncHandler(async (req,res)=>{
     const id=req.params.id;
+    const update = {
+        name: req.body.name,
+        contact: req.body.contact,
+        email: req.body.email
+    };
+    await Contact.findByIdAndUpdate(id,update);
+    res.json({
+        msg:"Contact updated!"
+    })
 })
 
 //@desc delte contact
@@ -48,6 +68,10 @@ const putContact=asyncHandler(async (req,res)=>{
 //@access public
 const deleteContact=asyncHandler(async (req,res)=>{
     const id=req.params.id;
+    await Contact.deleteOne({_id:id})
+    res.json({
+        msg:"Contact Deleted!"
+    })
 })
 
 module.exports={
