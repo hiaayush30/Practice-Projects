@@ -5,7 +5,10 @@ const connectDB=mongoose.connect(process.env.CONNECTION_STRING).then(()=>{
 })
 
 const contactSchema=new mongoose.Schema({
-    name:String,
+    name:{
+        type:String,
+        required:[true,"Please provide a name"]
+    },
     contact:Number,
     email:String
 })
