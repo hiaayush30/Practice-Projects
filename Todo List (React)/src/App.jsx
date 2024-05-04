@@ -38,7 +38,7 @@ const App = () => {
                 if (element.id == id) {
                     return { ...element, isComplete: !element.isComplete }
                 }
-                return e;
+                return element;
             })
             setTodo(updatedTodos);
     }
