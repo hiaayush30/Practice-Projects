@@ -34,13 +34,13 @@ const App = () => {
     function handleDone(e) {
         // todoRef.current.style.textDecorationLine = "line-through"; se bhi kar sakte the(if else condition lagake)
         const id = e.target.name;
-        const updatedTodos = todos.map((e) => {
-            if (e.id == id) {
-                return { ...e, isComplete: !e.isComplete }
-            }
-            return e;
-        })
-        setTodo(updatedTodos);
+            const updatedTodos = todos.map((element) => {
+                if (element.id == id) {
+                    return { ...element, isComplete: !element.isComplete }
+                }
+                return e;
+            })
+            setTodo(updatedTodos);
     }
 
     function handleSubmit() {
@@ -98,7 +98,7 @@ const App = () => {
                         return (
                             <div key={e.id} className="todo flex w-3/4 justify-between">
                                 <div className='flex max-w-screen'>
-                                    <input name={e.id} className='m-1' type='checkbox' onClick={handleDone} />
+                                    <input name={e.id} className='m-1' type='checkbox' onClick={handleDone} checked={e.isComplete}/>
                                     {e.isComplete ? <div ref={todoRef} className="line-through ">{e.input}</div> : <div ref={todoRef}>{e.input}</div>}
                                 </div>
                                 <div className="buttons flex h-full">
