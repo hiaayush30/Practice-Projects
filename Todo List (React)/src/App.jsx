@@ -80,11 +80,12 @@ const App = () => {
         <>
             <Navbar />
             <div className='container mx-auto my-5 rounded-xl bg-violet-500  p-5 min-h-[80vh]'>   {/*or min-h-screen to get full screen height*/}
-
-                <div className="addTodo my-5 ">
+                <div className="addTodo my-5">
                     <h2 className="addTodo text-lg font-bold">Add a Todo</h2>
+                    <div className='flex gap-5'>
                     <input ref={inputRef} className='w-80 p-1 rounded-sm' type='text' placeholder='Enter Todo here'></input>
-                    <button onClick={handleSubmit} className='bg-violet-600 hover:bg-violet-700 p-1 rounded-lg text-white mx-2 text-sm hover:font-bold'>Submit</button>
+                    <button onClick={handleSubmit} className='bg-violet-600 hover:bg-violet-700 p-1 rounded-lg text-white text-sm hover:font-bold'>Submit</button>
+                    </div>
                 </div>
                 <div className='flex gap-1'>
                     <input type='checkbox' checked={showFinished} onChange={toggleFinished}></input>
