@@ -2,6 +2,7 @@ const express = require("express");
 const cors=require("cors");
 const userRoute = require("./routes/user");
 const accountRoute = require("./routes/account");
+const authMiddleware = require("./Middlewares/middleware");
 const app=express();
 
 app.use(express.json());
