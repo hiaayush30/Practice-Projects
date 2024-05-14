@@ -18,7 +18,7 @@ const Dashboard = () => {
         axios.get("http://localhost:3000/api/v1/verify",{
         headers:{Authorization:token}
       }).then((response)=>{
-        alert("welcome back!")
+        alert("welcome!")
       }).catch((e)=>{
        if(e.response){
         alert("Something went wrong!,please sign in again");
