@@ -1,44 +1,63 @@
-const {Router}=require("express");
+const { Router } = require("express");
 const authMiddleware = require("../Middlewares/middleware");
 const { Account } = require("../db/db");
-const accountRoute=Router();
-const zod=require("zod")
+const accountRoute = Router();
+const zod = require("zod");
+const mongoose=require("mongoose")
 
-const transferSchema=zod.object({
-    to:zod.string(),
-    amount:zod.number()
+const transferSchema = zod.object({
+    to: zod.string(),
+    amount: zod.number()
 })
 
-accountRoute.get("/balance",authMiddleware,async(req,res,next)=>{
-    const userAccount=await Account.findOne({userId:req.userId});
+accountRoute.get("/balance", authMiddleware, async (req, res, next) => {
+    const userAccount = await Account.findOne({ userId: req.userId });
     res.status(200).json({
-        balance:userAccount.balance
+        balance: userAccount.balance
     })
 })
 
-accountRoute.post("/transfer",authMiddleware,async(req,res)=>{
-    if(!transferSchema.safeParse(req.body).success){
+accountRoute.post("/transfer", authMiddleware, async (req, res) => {
+try{
+    if (!transferSchema.safeParse(req.body).success) {
         res.json({
-            msg:"Invalid inputs!"
+            msg: "Invalid Inputs!"
         })
+        return
     }
-    const transferAccountId=req.body.to;
-    const amount=req.body.amount
-    const donor=await Account.findOne({userId:req.userId});
-    const reciever=await Account.findOne({userId:transferAccountId});
-
-    if(donor.balance<amount){
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    const { amount, to } = req.body;
+    const giver = await Account.findOne({ userId: req.userId }).session(session);
+    if (giver.balance < amount) {
         res.status(400).json({
-            msg:"Insufficient Balance!"
+            msg: "Insufficient balance"
         })
+        return
     }
-    if(!reciever){
-        res.status(400).jsom({
-            msg:"Invalid Account!"
+    const reciever = await Account.findOne({ userId: to }).session(session);
+    if (!reciever) {
+        res.status(400).json({
+            msg: "Invalid Account!"
         })
+        return
     }
-   const newDonorBalance=donor.balance-amount;
+
+    await Account.updateOne({ userId: req.userId}, {
+        $inc: { balance: -amount }
+    }).session(session)
+    await Account.updateOne({ userId: to }, {
+        $inc: { balance: amount }
+    }).session(session)
+
+    res.status(200).json({
+        msg: "Transaction successfull!"
+    })
+    session.commitTransaction();
+}catch(e){
+    console.log(e);
+}
 })
 
 
-module.exports=accountRoute
+module.exports = accountRoute

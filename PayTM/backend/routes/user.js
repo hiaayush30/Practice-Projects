@@ -8,9 +8,9 @@ const authMiddleware = require("../Middlewares/middleware");
 
 const userSignupSchema = zod.object({
     username: zod.string().email(),
-    firstName: zod.string(),
-    lastName: zod.string(),
-    password: zod.string().min(6)
+    firstName: zod.string().trim().min(1),
+    lastName: zod.string().trim().min(1),
+    password: zod.string().trim().min(6)
 })
 
 const userUpdateSchema = zod.object({
@@ -19,26 +19,26 @@ const userUpdateSchema = zod.object({
     lastName: zod.string().optional(),
 })
 
-userRoute.post("/signup", async (req, res, next) => {
+const signInSchema=zod.object({
+    username:zod.string(),
+    password:zod.string()
+})
+
+userRoute.post("/signup", async (req, res) => {
     if (!userSignupSchema.safeParse(req.body).success) {
-        res.json({
-            message: "Email already taken / Incorrect inputs"
+        res.status(400).json({
+            msg: "Email already taken / Incorrect inputs"
         })
         return
     }
     const existingUser = await User.findOne({ username: req.body.username })
     if (existingUser) {
         res.status(411).json({
-            message: "Email already taken / Incorrect inputs"
+            msg: "Email already taken / Incorrect inputs"
         })
         return
     }
-    const user = await User.create({
-        username: req.body.username,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        password: req.body.password
-    })
+    const user = await User.create(req.body)
 
     await Account.create({
         userId:user._id,
@@ -47,15 +47,21 @@ userRoute.post("/signup", async (req, res, next) => {
     
     const token = jwt.sign({ userId: user._id }, JWT_PASSWORD);
     res.status(200).json({
-        message: "User created successfully",
+        msg: "User created successfully",
         token: "Bearer " + token,
     })
 })
 
-userRoute.post("/signin", authMiddleware, async (req, res, next) => {
-    const userExists = await User.findOne({ _id: req.userId })
+userRoute.post("/signin", async (req, res, next) => {
+    if(!signInSchema.safeParse(req.body)){
+        res.json({
+            msg:"Invalid Inputs!"
+        })
+    }
+    const userExists = await User.findOne({username:req.body.username,password:req.body.password})
     if (userExists) {
-        const token = jwt.sign({ userId: req.userId }, JWT_PASSWORD);
+        const userId=userExists._id
+        const token = jwt.sign({ userId: userId }, JWT_PASSWORD);
         res.status(200).json({
             msg: "Signed in successfully!",
             token: "Bearer " + token,
@@ -63,21 +69,21 @@ userRoute.post("/signin", authMiddleware, async (req, res, next) => {
         return
     }
     res.status(411).json({
-        message: "Error while logging in/ User not found!"
+        msg: "Error while logging in/ User not found!"
     })
 })
 
-userRoute.put("/", authMiddleware, async (req, res, next) => {
+userRoute.put("/", authMiddleware, async (req, res) => {
     const updateBody = userUpdateSchema.safeParse(req.body);
     if (!updateBody.success) {
         res.status(411).json({
-            message: "Error while updating information"
+            msg: "Error while updating information"
         })
         return
     }
     await User.updateOne({ _id: req.userId }, req.body)
     res.status(200).json({
-        message: "Updated successfully"
+        msg: "Updated successfully"
     })
 })
 
