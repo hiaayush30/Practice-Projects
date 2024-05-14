@@ -10,6 +10,11 @@ app.use(cors());
 
 app.use("/api/v1/user",userRoute); 
 app.use("/api/v1/account",accountRoute)
+app.get("/api/v1/verify",authMiddleware,(req,res)=>{
+    res.status(200).json({
+        msg:"signed in!"
+    })
+})
 
 const PORT=3000;
 app.listen(3000,()=>{
